@@ -619,22 +619,25 @@ all_rasters<-c(deer_w, moose_w, elk_w, sheep_w, goat_w, wolf_w,elevation2, disth
 #with stars
 #all_rasters_stars<-c(deer_w_stars, moose_w_stars, elk_w_stars, sheep_w_stars, goat_w_stars, wolf_w_stars,elevation2_stars, disthumanaccess2_stars, disthighhumanacess_stars)
 
+crs(elevation2) <- "+proj=utm +zone=11 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0"
+crs(disthumanaccess) <- "+proj=utm +zone=11 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0"
+crs(disthighhumanaccess) <- "+proj=utm +zone=11 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0"
 class(all_rasters)
 
 #Extract covariate values for Red Deer wolf data  
-cov.outRD<-extract(all_rasters, rd.data)
+cov.outRD<- raster::extract(all_rasters, rd.data)
 head(cov.outRD)
 
 #Extract covariate values for available points
 rd.avail_sf<-st_as_sf(rd.avail) #first change rd.avail to data type sf
-cov.availRD<-extract(all_rasters, rd.avail_sf)
+cov.availRD<-raster::extract(all_rasters, rd.avail_sf)
 
 #Extract covariate values for Bow valley wolf data  
-cov.outBV<-extract(all_rasters, bv.data)
+cov.outBV<-raster::extract(all_rasters, bv.data)
 
 #Extract covariate values for available points
 bv.avail_sf <- st_as_sf(bv.avail)
-cov.availBV<-extract(all_rasters, bv.avail_sf)
+cov.availBV<-raster::extract(all_rasters, bv.avail_sf)
 ```
 
 
@@ -743,7 +746,7 @@ aggregate(Elevation2 ~ pack, data=wolfused, FUN=mean)
 aggregate(DistFromHumanAccess2 ~ pack, data=wolfused, FUN=mean)
 aggregate(.~pack, data=wolfused[c("pack", "DEER_W", "ELK_W", "MOOSE_W", "SHEEP_W", "GOAT_W")], mean)
 
-sapply(wolfused, median, na.rm=TRUE)
+sapply(wolfused[2:10], median, na.rm=TRUE)
 ```
 
 ## Summary Statistics with Tibble
