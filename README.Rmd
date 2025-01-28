@@ -179,6 +179,8 @@ The steps involved in creating these rasters below are key, and, good to review.
 mask.raster <- rast()
 
 #set extent (note that I customized this extent so it covered both elc_habitat and humanacess)
+#to get the extent of one of these:
+#ext(elc_habitat)
 ext(mask.raster) <- c(xmin=443680.6, xmax=650430.4, ymin=5618416, ymax=5789236) 	
 
 #set the resolution to 30 m 
@@ -298,6 +300,7 @@ In the human access shapefile, there is a field for the classification of human 
 ```{r}
 #first reclassify labels on humanaccess.shp file so they are correct (note: need to bring in humanaccess.shp above)
 levels(as.factor(humanaccess$SUM_CLASS))
+#this is what they used to be
 #[1] "0"         "High"      "HIGH"      "Low"       "LOW"      
 #[6] "MEDIUM"    "Moderate"  "Nil"       "NIL"       "VERY HIGH"
 #convert humanaccess$SUM_CLASS to a factor
@@ -309,10 +312,11 @@ levels(humanaccess$SUM_CLASS)[3]<-"LOW"
 levels(humanaccess$SUM_CLASS)[5]<-"MODERATE"
 levels(humanaccess$SUM_CLASS)[6]<-"NIL"
 
-#create indicator variable for high or not high human access
+#create indicator variable for high or very high human access
 highaccess<-humanaccess[humanaccess$SUM_CLASS=="HIGH" | humanaccess$SUM_CLASS=="VERY HIGH", ]
 
 #use package tmap() to create simple plots
+#making all the high or very high units red
 humanaccess_plot <- tm_shape(humanaccess)+tm_sf()
 humanaccess_plot + tm_shape(highaccess) + tm_sf(col = "red") 
 ```
@@ -354,8 +358,10 @@ table(rd.data$NAME)
 #remove these individuals with too few of locations
 names(rd)<-"NAME"
 rd<-rd[rd@data$NAME!="69" & rd@data$NAME!="81" & rd@data$NAME!="82" & rd@data$NAME!="84",]
-#remove unused NAME levels
-rd@data$NAME<-factor(rd@data$NAME)
+#remove unused NAME levels (seemingly unnecessary when they are characters, however,
+#if they are factors then would have to potentially use the code below)
+#an atomic vector is like a list of lists
+#rd@data$NAME<-factor(rd@data$NAME)
 ```
 
 Next we will fit a 99% Minimum Convex Polygon to these cleaned data for EACH individual wolf. 
@@ -371,7 +377,7 @@ plot(rd, col="black", add=TRUE)
 #check area in square meters for each Red Deer wolf pack
 as.data.frame(cp.rd)
 
-#calculate area for different percents of MPC in square meters. 
+#calculate area for different percents of MCP in square meters. 
 mcp.area(rd, percent=seq(50, 100, by=5))
 ```
 
@@ -439,9 +445,9 @@ plot(cp.bow[cp.bow@data$id=="44",], col="green",add=TRUE)
 plot(bv, col="black", add=TRUE)
 ```
 
-## Red Deer wolves
+## Bow Valley wolves
 ```{r, warning= FALSE}
-#check area for each Red Deer wolf pack
+#check area for each bow valley wolf pack
 as.data.frame(cp.bow)
 
 #calculate area for different percents of MPC
@@ -484,6 +490,7 @@ hr95 <- data.frame(hr95)
 coordinates(hr95) <- coordinates(bow.valleyud[[1]])
 gridded(hr95) <- TRUE 
 ## display the results 
+#could convert this into a mask if you wanted
 image(hr95)
 ```
 
